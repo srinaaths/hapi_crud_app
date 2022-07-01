@@ -77,9 +77,9 @@ const deleteMovie = (request, reply) => {
     }
 }
 
-const searchByName = (request, reply) => {
+const searchByName = async (request, reply) => {
     const nameToSearch = request.params.name;
-    const resArr = moviesList.movies.filter((movie) => {
+    const resArr = await moviesList.movies.filter((movie) => {
         if(movie.name === nameToSearch)
             return true;
     })
