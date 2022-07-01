@@ -77,4 +77,14 @@ const deleteMovie = (request, reply) => {
     }
 }
 
-module.exports = { handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie }
+const searchByName = (request, reply) => {
+    const nameToSearch = request.params.name;
+    const resArr = moviesList.movies.filter((movie) => {
+        if(movie.name === nameToSearch)
+            return true;
+    })
+    console.log(resArr);
+    reply(resArr).code(200);
+}
+
+module.exports = { handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie, searchByName }

@@ -1,5 +1,5 @@
 const Hapi = require('hapi')
-const {handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie} = require('./controllers/Controller.js')
+const {handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie, searchByName} = require('./controllers/Controller.js')
 
 const server = new Hapi.Server();
 
@@ -32,6 +32,11 @@ server.route([{
     method: 'DELETE',
     path: '/movie/{id}',
     handler: deleteMovie
+},
+{
+    method: 'GET',
+    path: '/search/{name}',
+    handler: searchByName
 }
 ])
 
