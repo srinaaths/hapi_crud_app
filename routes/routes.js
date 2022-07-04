@@ -1,5 +1,5 @@
 const {handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie, searchByName} = require('../controllers/Controller.js') 
-const {movieIdValidator, movieNameValidator} = require('../validation.js')
+const {movieIdValidator, movieNameValidator, movieValidator} = require('../validation.js')
 const Joi = require('joi')
 module.exports = [
 {
@@ -23,9 +23,7 @@ module.exports = [
     config: {
         handler: updateMovie,
         validate: {
-            params: {
-                id: Joi.number().min(1).max(100000).required()
-            }
+            params: movieIdValidator
         }
     }
 },
@@ -35,9 +33,7 @@ module.exports = [
     config: {
         handler: deleteMovie,
         validate: {
-            params: {
-                id: Joi.number().min(1).max(100000).required()
-            }
+            params: movieIdValidator
         }
     }
 },
@@ -47,10 +43,8 @@ module.exports = [
     config: {
         handler: searchByName,
         validate: {
-            params: {
-                // name: Joi.string().alphanum().min(2).max(30).required()
-                name: Joi.string().regex(/^[ A-Za-z0-9&]*$/).required()
-            }
-        }
+            params: movieNameValidator
     }
+}
 }];
+
