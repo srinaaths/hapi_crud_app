@@ -48,7 +48,8 @@ module.exports = [
         handler: searchByName,
         validate: {
             params: {
-                name: Joi.string().alphanum().min(2).max(30).required()
+                // name: Joi.string().alphanum().min(2).max(30).required()
+                name: Joi.string().regex(/^[ A-Za-z0-9&]*$/).required()
             }
         }
     }
