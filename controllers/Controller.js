@@ -1,4 +1,5 @@
 const moviesList = require('../data.json')
+const { movieIdValidator, movieNameValidator } = require('../validation.js')
 const fs = require('fs')
 const path = require('path')
 
@@ -22,69 +23,93 @@ const postMovie = async (request, reply) => {
             console.log(err.message);
         console.log('success');
     })
-    await reply('created').code(201)
+    await reply({ "message": "movie created" }).code(201)
 }
 
-const updateMovie = async(request, reply) => {
-    const id = request.params.id;
-    const payload = request.payload;
-    payload.id = Number(request.params.id);
-    let indexToUpdate;
-    let flag = false;
-    for (let i = 0; i < moviesList.movies.length; ++i) {
-        if (moviesList.movies[i].id == id) {
-            indexToUpdate = i;
-            flag = true;
-        }
-    }
-    console.log(flag);
-    if (!flag) {
-        reply('no movie found to update').code(200);
+const updateMovie = async (request, reply) => {
+    const id = Number(request.params.id);
+    // if (!Number.isInteger(id)) {
+    //     reply({ 'message': 'enter a valid id' }).code(400);
+    // }
+    const { error, value } = movieIdValidator.validate({ id })
+    console.log(error);
+    if (error) {
+        reply({ 'error': 'invalid input format' }).code(400);
     }
     else {
-        moviesList.movies.splice(indexToUpdate, 1, payload);
-        const pathToWrite = path.join(__dirname, '..', 'data.json')
-        fs.writeFile(pathToWrite, JSON.stringify(moviesList), (err) => {
-            if (err)
-                console.log(err.message);
-            console.log('success');
-        })
-        await reply('updated').code(200);
+        const payload = request.payload;
+        payload.id = Number(request.params.id);
+        let indexToUpdate;
+        let flag = false;
+        for (let i = 0; i < moviesList.movies.length; ++i) {
+            if (moviesList.movies[i].id == id) {
+                indexToUpdate = i;
+                flag = true;
+            }
+        }
+        console.log(flag);
+        if (!flag) {
+            reply({ "message": "no movie found to update" }).code(200);
+        }
+        else {
+            moviesList.movies.splice(indexToUpdate, 1, payload);
+            const pathToWrite = path.join(__dirname, '..', 'data.json')
+            fs.writeFile(pathToWrite, JSON.stringify(moviesList), (err) => {
+                if (err)
+                    console.log(err.message);
+                console.log('success');
+            })
+            await reply({ "message": "movie updated" }).code(200);
+        }
     }
 }
 
 const deleteMovie = (request, reply) => {
-    const id = request.params.id;
-    let indexToDelete;
-    let flag = false;
-    for (let i = 0; i < moviesList.movies.length; ++i) {
-        if (moviesList.movies[i].id == id) {
-            indexToDelete = i;
-            flag = true;
-        }
+    const id = Number(request.params.id);
+    const { error, value } = movieIdValidator.validate({ id })
+    if (error) {
+        reply({ 'error': 'invalid input format' }).code(400);
     }
-    if (!flag)
-        reply('no movie found to delete');
     else {
-        moviesList.movies.splice(indexToDelete, 1);
-        const pathToWrite = path.join(__dirname, '..', 'data.json')
-        fs.writeFile(pathToWrite, JSON.stringify(moviesList), (err) => {
-            if (err)
-                console.log(err.message);
-            console.log('success');
-        })
-        reply('deleted').code(204);
+        let indexToDelete;
+        let flag = false;
+        for (let i = 0; i < moviesList.movies.length; ++i) {
+            if (moviesList.movies[i].id == id) {
+                indexToDelete = i;
+                flag = true;
+            }
+        }
+        if (!flag)
+            reply({ "message": "movie not found" });
+        else {
+            moviesList.movies.splice(indexToDelete, 1);
+            const pathToWrite = path.join(__dirname, '..', 'data.json')
+            fs.writeFile(pathToWrite, JSON.stringify(moviesList), (err) => {
+                if (err)
+                    console.log(err.message);
+                console.log('success');
+            })
+            reply({ "message": "deleted" }).code(204);
+        }
     }
 }
 
 const searchByName = async (request, reply) => {
     const nameToSearch = request.params.name;
-    const resArr = await moviesList.movies.filter((movie) => {
-        if(movie.name === nameToSearch)
-            return true;
-    })
-    console.log(resArr);
-    reply(resArr).code(200);
+    const name = nameToSearch;
+    const { error, value } = movieNameValidator.validate({ name })
+    if (error)
+        reply({ 'error': 'enter a valid format of name' }).code(400)
+    else {
+        const resArr = await moviesList.movies.filter((movie) => {
+            if (movie.name === nameToSearch)
+                return true;
+        })
+        if (resArr.length == 0)
+            reply({ 'message': 'no movies found' }).code(200)
+        else
+            reply(resArr).code(200);
+    }
 }
 
 module.exports = { handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie, searchByName }

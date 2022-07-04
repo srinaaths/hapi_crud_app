@@ -1,8 +1,6 @@
 const Hapi = require('hapi')
 const routes = require('./routes/routes.js')
 
-const {handlerFunction, getAllMovies, postMovie, updateMovie, deleteMovie, searchByName} = require('./controllers/Controller.js')
-
 const server = new Hapi.Server();
 
 server.connection({
