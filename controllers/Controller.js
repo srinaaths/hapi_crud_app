@@ -28,9 +28,6 @@ const postMovie = async (request, reply) => {
 
 const updateMovie = async (request, reply) => {
     const id = Number(request.params.id);
-    // if (!Number.isInteger(id)) {
-    //     reply({ 'message': 'enter a valid id' }).code(400);
-    // }
     const { error, value } = movieIdValidator.validate({ id })
     console.log(error);
     if (error) {
